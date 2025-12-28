@@ -16,12 +16,13 @@ const pool = mysql.createPool({
     user: process.env.DB_USER || "root",
     password: process.env.DB_PASS || "rootpass",
     database: process.env.DB_NAME || "vr_rental",
+    port: process.env.DB_PORT || 3306, // ポート番号も環境変数から読み込む
     charset: "utf8mb4",
+    ssl: { rejectUnauthorized: false }, // 💡 クラウドDB接続に必須の設定
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
 });
-
 // ==========================================
 // 1. 新規登録 API
 // ==========================================
