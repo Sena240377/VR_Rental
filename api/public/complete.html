@@ -4,20 +4,92 @@
     <meta charset="UTF-8">
     <title>予約完了</title>
     <style>
-        body { font-family: sans-serif; text-align: center; margin-top: 100px; }
-        .vr-id { font-size: 64px; color: #28a745; font-weight: bold; margin: 20px 0; }
+        body { 
+            font-family: sans-serif; 
+            margin: 0; 
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            background-color: #f4f7f6; 
+        }
+        .container { 
+            width: 450px; 
+            text-align: center; 
+            background: white; 
+            padding: 40px; 
+            border-radius: 15px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+        }
+        .success-icon { 
+            font-size: 50px; 
+            color: #28a745; 
+            margin-bottom: 20px; 
+        }
+        h2 { color: #333; }
+        .info-box { 
+            margin: 25px 0; 
+            padding: 20px; 
+            background: #eef2f3; 
+            border-radius: 10px; 
+        }
+        .vr-id { 
+            font-size: 36px; 
+            font-weight: bold; 
+            color: #007bff; 
+        }
+        .btn-group { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+        }
+        .btn { 
+            padding: 12px; 
+            font-size: 16px; 
+            text-decoration: none; 
+            border-radius: 5px; 
+            transition: 0.3s; 
+        }
+        .btn-primary { 
+            background: #007bff; 
+            color: white; 
+        }
+        .btn-primary:hover { background: #0056b3; }
+        .btn-secondary { 
+            background: #6c757d; 
+            color: white; 
+        }
+        .btn-secondary:hover { background: #5a6268; }
     </style>
 </head>
 <body>
-    <h1>予約が完了しました</h1>
-    <p>あなたの貸出VR ID：</p>
-    <div class="vr-id" id="displayId">--</div>
-    <p><a href="reservation.html">戻る</a></p>
+    <div class="container">
+        <div class="success-icon">Check!</div>
+        <h2>予約が完了しました</h2>
+        
+        <div class="info-box">
+            <p>予約された機材のID</p>
+            <div id="vrDisplay" class="vr-id">--</div>
+        </div>
+
+        <p>利用時間は1時間です。<br>終了後は速やかに返却手続きを行ってください。</p>
+
+        <div class="btn-group">
+            <a href="reservation.html" class="btn btn-primary">現在の予約状況を見る</a>
+            <a href="return.html" class="btn btn-secondary">返却ページへ</a>
+        </div>
+    </div>
 
     <script>
+        // URLパラメータ（?vr_id=◯◯）からIDを取得して表示する
         const params = new URLSearchParams(window.location.search);
         const vrId = params.get('vr_id');
-        document.getElementById('displayId').innerText = vrId;
+        
+        if (vrId) {
+            document.getElementById('vrDisplay').innerText = "VR - " + vrId;
+        } else {
+            document.getElementById('vrDisplay').innerText = "不明なID";
+        }
     </script>
 </body>
 </html>
