@@ -1,0 +1,10 @@
+# Node.js
+api/node_modules/
+npm-debug.log
+
+# Docker / Database (ローカルのデータ)
+mysql-data/
+
+# OSファイル
+.DS_Store
+Thumbs.db

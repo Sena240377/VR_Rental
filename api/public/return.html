@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>VR返却</title>
+    <style>
+        body { font-family: sans-serif; margin: 0; min-height: 100vh; display: flex; justify-content: center; align-items: center; background-color: #f4f7f6; }
+        .container { width: 400px; text-align: center; background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h2 { color: #333; }
+        input { width: 100%; padding: 12px; margin: 20px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 18px; text-align: center; }
+        .btn { width: 100%; padding: 15px; font-size: 18px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; transition: 0.3s; }
+        .btn:hover { background: #0056b3; }
+        .back-link { display: block; margin-top: 20px; color: #666; text-decoration: none; font-size: 14px; }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>VR返却</h2>
+        <p>返却するVRのID（1〜50）を入力してください</p>
+        <input type="number" id="vrIdInput" placeholder="VR IDを入力" min="1" max="50">
+        <button class="btn" id="returnBtn">返却を実行する</button>
+        <a href="reservation.html" class="back-link">← 予約状況を確認する</a>
+    </div>
+
+    <script>
+        document.getElementById('returnBtn').addEventListener('click', async () => {
+            const vrId = document.getElementById('vrIdInput').value;
+            
+            if (!vrId) {
+                alert("VR IDを入力してください。");
+                return;
+            }
+
+            try {
+                const res = await fetch("/api/return", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ vr_id: vrId })
+                });
+                
+                const result = await res.json();
+                
+                if (res.ok) {
+                    alert(result.message);
+                    location.href = "reservation.html"; // 予約ページに戻って在庫が増えたか確認
+                } else {
+                    alert("エラー: " + result.error);
+                }
+            } catch (e) {
+                console.error("通信エラー:", e);
+                alert("サーバーとの通信に失敗しました。");
+            }
+        });
+    </script>
+</body>
+</html>

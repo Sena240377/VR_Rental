@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>予約完了</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; margin-top: 100px; }
+        .vr-id { font-size: 64px; color: #28a745; font-weight: bold; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h1>予約が完了しました</h1>
+    <p>あなたの貸出VR ID：</p>
+    <div class="vr-id" id="displayId">--</div>
+    <p><a href="reservation.html">戻る</a></p>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const vrId = params.get('vr_id');
+        document.getElementById('displayId').innerText = vrId;
+    </script>
+</body>
+</html>

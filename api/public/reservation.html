@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>VR予約状況</title>
+    <style>
+        body { font-family: sans-serif; margin: 0; min-height: 100vh; display: flex; justify-content: center; align-items: center; background-color: #f4f7f6; }
+        .container { width: 500px; text-align: center; background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .status-box { margin: 25px 0; padding: 20px; background: #eef2f3; border-radius: 10px; }
+        .count { font-size: 32px; font-weight: bold; color: #007bff; }
+        
+        /* 共通ボタン設定 */
+        .btn { width: 100%; padding: 15px; font-size: 18px; border: none; border-radius: 5px; cursor: pointer; transition: 0.3s; margin-bottom: 10px; }
+        
+        /* 予約ボタン（緑） */
+        .btn-reserve { background: #28a745; color: white; }
+        .btn-reserve:hover { background: #218838; }
+        
+        /* 返却ボタン（青） */
+        .btn-return { background: #007bff; color: white; }
+        .btn-return:hover { background: #0056b3; }
+
+        .footer-links { margin-top: 20px; font-size: 14px; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>VR予約状況</h2>
+        <p>ようこそ、<span id="userName" style="font-weight:bold;">ゲスト</span> 様</p>
+        
+        <div class="status-box">
+            <p>予約可能： <span id="availableCount" class="count">--</span> 台</p>
+            <p>貸出中： <span id="rentedCount" class="count" style="color: #dc3545;">--</span> 台</p>
+        </div>
+
+        <button class="btn btn-reserve" id="reserveBtn">新規予約する</button>
+
+        <button class="btn btn-return" onclick="location.href='return.html'">VRを返却する</button>
+
+        <div class="footer-links">
+            <p>※1回の予約で1時間貸出可能です。</p>
+        </div>
+    </div>
+
+    <script>
+        let nextId = null; 
+        const userId = localStorage.getItem('userId');
+        const userName = localStorage.getItem('userName');
+        
+        if (!userId) {
+            alert("ログイン情報がありません。新規登録からやり直してください。");
+            location.href = "index.html";
+        }
+        document.getElementById('userName').innerText = userName || "ゲスト";
+
+        const formatDateForMySQL = (date) => {
+            const pad = (n) => n < 10 ? '0' + n : n;
+            return date.getFullYear() + '-' +
+                pad(date.getMonth() + 1) + '-' +
+                pad(date.getDate()) + ' ' +
+                pad(date.getHours()) + ':' +
+                pad(date.getMinutes()) + ':' +
+                pad(date.getSeconds());
+        };
+
+        async function fetchStatus() {
+            try {
+                const res = await fetch("/api/vr-status");
+                const data = await res.json();
+                document.getElementById('availableCount').innerText = data.availableCount;
+                document.getElementById('rentedCount').innerText = data.rentedCount;
+                nextId = data.nextAvailableId; 
+            } catch (error) {
+                console.error("在庫取得失敗:", error);
+            }
+        }
+
+        document.getElementById('reserveBtn').addEventListener('click', async () => {
+            if (nextId === null) {
+                alert("現在予約可能な機材がありません。");
+                return;
+            }
+
+            const now = new Date();
+            const end = new Date(now.getTime() + 60 * 60 * 1000); 
+
+            try {
+                const res = await fetch("/api/reserve", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        vr_id: nextId,
+                        start_at: formatDateForMySQL(now),
+                        end_at: formatDateForMySQL(end)
+                    })
+                });
+                
+                if (res.ok) {
+                    const result = await res.json();
+                    location.href = `complete.html?vr_id=${result.vr_id}`;
+                } else {
+                    alert("予約に失敗しました。");
+                }
+            } catch (e) {
+                alert("通信エラーが発生しました。");
+            }
+        });
+
+        fetchStatus();
+    </script>
+</body>
+</html>
